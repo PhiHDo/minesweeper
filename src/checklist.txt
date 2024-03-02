@@ -1,0 +1,7 @@
+//0. render board
+//1. populate a board with tiles/mines
+//2. left click on tiles
+//a. reveal tiles
+3. click icon to mark tile (aka right click)
+a. mark tile
+4. check for win/lose
