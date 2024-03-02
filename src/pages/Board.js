@@ -1,45 +1,53 @@
-import React, {Fragment, useEffect, useState} from "react";
-import EmojiFlagsIcon from '@mui/icons-material/EmojiFlags';
-import SentimentVeryDissatisfiedOutlinedIcon from '@mui/icons-material/SentimentVeryDissatisfiedOutlined';
-import Box from "@mui/material/Box"
-import sizes from '../utils/sizes'
-import {Button, Grid, Stack} from "@mui/material";
+import { Fragment, useEffect, useState } from "react";
+import EmojiFlagsIcon from "@mui/icons-material/EmojiFlags";
+import SentimentVeryDissatisfiedOutlinedIcon from "@mui/icons-material/SentimentVeryDissatisfiedOutlined";
+import Box from "@mui/material/Box";
+import sizes from "../utils/sizes";
+import { Button, Grid, Stack } from "@mui/material";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
+import * as React from "react";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 //code given by Dr. Kooshesh to render board, I tweaked it a bit to get a grid from connect 4
-const initBoard = (numMines) => 
-{
+const initBoard = (numMines) => {
     // returns the internal representation of the board.
-    const board = new Array(sizes.num_rows).fill(null).map(() => new Array(sizes.num_columns).fill({
-        backgroundColor: 'lightgrey',
-        hasMine: false,
-        mineRevealed: false,
-        value: 0,
-        hidden: true,
-        flag: false,
-    }));
+    const board = new Array(sizes.num_rows).fill(null).map(() =>
+        new Array(sizes.num_columns).fill({
+            backgroundColor: "lightgrey",
+            hasMine: false,
+            mineRevealed: false,
+            value: 0,
+            hidden: true,
+            flag: false,
+        })
+    );
 
     //if not bomb then check neighbors
     // if neighbor is a bomb then increment
 
     //placing mines on board
     let minesPlaced = 0;
-    while (minesPlaced < numMines) 
-    {
+    while (minesPlaced < numMines) {
         const mineRow = Math.floor(Math.random() * sizes.num_rows);
         const mineCol = Math.floor(Math.random() * sizes.num_columns);
 
         //check for neighboring mines
-        if (!board[mineRow][mineCol].hasMine)
-        {
+        if (!board[mineRow][mineCol].hasMine) {
             board[mineRow][mineCol] = {
                 ...board[mineRow][mineCol],
                 hasMine: true,
                 // mineRevealed: true,
-                backgroundColor: 'lightgrey',
+                backgroundColor: "lightgrey",
             };
-            //before
+            //before, keeping as a reminder of the mistake when previously trying to update object attributes
             // board[mineRow][mineCol] = true;
             // board[mineRow][mineCol].backgroundColor = 'grey';
             minesPlaced++;
@@ -51,10 +59,14 @@ const initBoard = (numMines) =>
         for (let colIdx = 0; colIdx < sizes.num_columns; colIdx++) {
             if (!board[rowIdx][colIdx].hasMine) {
                 const neighbors = findNeighborMine(board, rowIdx, colIdx);
-                board[rowIdx][colIdx] = { value: neighbors, hidden: true, backgroundColor: 'lightgrey' };
+                board[rowIdx][colIdx] = {
+                    value: neighbors,
+                    hidden: true,
+                    backgroundColor: "lightgrey",
+                };
             }
         }
-    }    
+    }
 
     return board;
 };
@@ -66,7 +78,12 @@ const findNeighborMine = (currBoard, rowIdx, colIdx) => {
         for (let j = -1; j <= 1; j++) {
             const cellRowNeighbor = rowIdx + i;
             const cellColNeighbor = colIdx + j;
-            if (cellRowNeighbor >= 0 && cellRowNeighbor < sizes.num_rows && cellColNeighbor >= 0 && cellColNeighbor < sizes.num_columns) {
+            if (
+                cellRowNeighbor >= 0 &&
+                cellRowNeighbor < sizes.num_rows &&
+                cellColNeighbor >= 0 &&
+                cellColNeighbor < sizes.num_columns
+            ) {
                 if (currBoard[cellRowNeighbor][cellColNeighbor].hasMine) {
                     neighbors++;
                 }
@@ -76,28 +93,26 @@ const findNeighborMine = (currBoard, rowIdx, colIdx) => {
     return neighbors;
 };
 
-const Cell = props => {
-
-    const {cellContent, onClickCallback} = props;
+const Cell = (props) => {
+    const { cellContent, onClickCallback } = props;
 
     const displayValue = () => {
-        if(!cellContent.hidden && cellContent.hasMine){
-            return <SentimentVeryDissatisfiedOutlinedIcon/>;
+        if (!cellContent.hidden && cellContent.hasMine) {
+            return <SentimentVeryDissatisfiedOutlinedIcon />;
         }
-        if (!cellContent.hidden)
-        {
+        if (!cellContent.hidden) {
             return cellContent.value;
         }
-        if(cellContent.flag)
-        {
-            return <EmojiFlagsIcon/>;
+        if (cellContent.flag) {
+            return <EmojiFlagsIcon />;
         }
 
         return null;
-    }
+    };
 
     return (
-        <Box onClick={() => onClickCallback() }
+        <Box
+            onClick={() => onClickCallback()}
             sx={{
                 width: sizes.cell_width,
                 height: sizes.cell_height,
@@ -107,69 +122,69 @@ const Cell = props => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: '32px',
-                fontFamily: 'Courier New, monospace',
+                fontSize: "32px",
+                fontFamily: "Courier New, monospace",
             }}
         >
             {/* {cellContent.hidden ? null : cellContent.value} */}
             {displayValue()}
         </Box>
-    )
-}
+    );
+};
 
-const Row = props => {
-
-    const {row, onClickCallback} = props;
+const Row = (props) => {
+    const { row, onClickCallback } = props;
 
     return (
         <Fragment>
             <Grid container columns={sizes.num_columns}>
-                {
-                    row.map((cellContent, colIdx) => {
-                        return <Grid item xs={1} key={colIdx}>
-                            <Cell cellContent={cellContent} onClickCallback={() => onClickCallback(colIdx)} />
+                {row.map((cellContent, colIdx) => {
+                    return (
+                        <Grid item xs={1} key={colIdx}>
+                            <Cell
+                                cellContent={cellContent}
+                                onClickCallback={() => onClickCallback(colIdx)}
+                            />
                         </Grid>
-                    })
-                }
+                    );
+                })}
             </Grid>
         </Fragment>
-    )
-}
+    );
+};
 
-const DifficultyToggle = props => {
-    
+const DifficultyToggle = (props) => {
     // const {difficulty, setDifficulty} = props;
     const [difficulty, setDifficulty] = useState("Standard");
 
     const handleChange = (event, newDifficulty) => {
-        if(newDifficulty === "Standard")
-        {
+        if (newDifficulty === "Standard") {
             setDifficulty(newDifficulty);
+            //in hindsight I am not sure why I did not initially utilize useState here...
             sizes.num_rows = 8;
             sizes.num_columns = 8;
             sizes.mines = 10;
             sizes.cell_width = 60;
             sizes.cell_height = 60;
-        }
-        else if(newDifficulty === "Hard")
-        {
+        } else if (newDifficulty === "Hard") {
             setDifficulty(newDifficulty);
-            sizes.num_rows = 12;
-            sizes.num_columns = 12;
-            sizes.mines = 25;
-            sizes.cell_width = 40;
-            sizes.cell_height = 40;
+            sizes.num_rows = 16;
+            sizes.num_columns = 16;
+            sizes.mines = 40;
+            sizes.cell_width = 30;
+            sizes.cell_height = 30;
         }
-    }
-    return(
+    };
+    return (
         <Box
-        sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            m: 1,
-        }}>
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                m: 1,
+            }}
+        >
             <ToggleButtonGroup
                 color="primary"
                 value={difficulty}
@@ -177,32 +192,44 @@ const DifficultyToggle = props => {
                 onChange={handleChange}
                 aria-label="Platform"
             >
-                <ToggleButton value={"Standard"} /*onClick={() => {window.location.reload(false)}}*/>Standard</ToggleButton>
-                <ToggleButton value={"Hard"} /*onClick={() => {window.location.reload(false)}}*/>Hard</ToggleButton>
+                <ToggleButton
+                    value={
+                        "Standard"
+                    } /*onClick={() => {window.location.reload(false)}}*/
+                >
+                    Standard
+                </ToggleButton>
+                <ToggleButton
+                    value={
+                        "Hard"
+                    } /*onClick={() => {window.location.reload(false)}}*/
+                >
+                    Hard
+                </ToggleButton>
             </ToggleButtonGroup>
         </Box>
     );
-}
+};
 
-
-
-const Board = props => {
-
+const Board = (props) => {
     //added this
     const numMines = sizes.mines;
 
-    const width = () => sizes.num_columns * sizes.cell_width +
-    (sizes.num_columns - 1) * sizes.h_gap;
-    const height = () => sizes.num_rows * sizes.cell_height +
-    (sizes.num_rows - 1) * sizes.v_gap;
+    const width = () =>
+        sizes.num_columns * sizes.cell_width +
+        (sizes.num_columns - 1) * sizes.h_gap;
+    const height = () =>
+        sizes.num_rows * sizes.cell_height + (sizes.num_rows - 1) * sizes.v_gap;
 
-    const [board, setBoard] = useState(initBoard(numMines)); 
+    const [board, setBoard] = useState(initBoard(numMines));
     const [button, setButton] = useState(null);
     const [timer, setTimer] = useState(0);
     const [gameOver, setGameover] = useState(false);
-    const [message, setMessage] = useState(""); 
+    const [message, setMessage] = useState("");
     const [flag, setFlag] = useState(false);
-    
+    const [statsTableTime, setstatsTableTime] = useState(null);
+    const [outcome, setOutcome] = useState(null);
+
     //added this
     useEffect(() => {
         setBoard(initBoard(numMines));
@@ -211,23 +238,29 @@ const Board = props => {
     //timer
     useEffect(() => {
         let seconds;
-        if(!gameOver){
+        if (!gameOver) {
             seconds = setInterval(() => {
                 setTimer((timer) => timer + 1);
             }, 1000);
         }
-            return () => clearInterval(seconds);
+        return () => clearInterval(seconds);
     }, [gameOver]);
 
     //win condition
     useEffect(() => {
-        const mines = board.flat().filter(cell => cell.backgroundColor === 'red').length; //#revealed mines
-        const unreavealedTiles = board.flat().filter(cell => !cell.hidden).length;
+        const mines = board
+            .flat()
+            .filter((cell) => cell.backgroundColor === "red").length; //#revealed mines
+        const unreavealedTiles = board
+            .flat()
+            .filter((cell) => !cell.hidden).length;
         const totalCells = sizes.num_rows * sizes.num_columns;
 
         //no mines are unveild and all nonmines are veild
         if (mines === 0 && unreavealedTiles === totalCells - numMines) {
             setGameover(true);
+            setstatsTableTime(timer);
+            setOutcome("Winner :)");
             setMessage("You win!");
         }
     }, [board, numMines]);
@@ -236,7 +269,7 @@ const Board = props => {
         // console.log(`rowIdx = ${rowIdx}, colIdx = ${colIdx}`);
 
         //prevent click when gameover is true
-        if(gameOver){
+        if (gameOver) {
             return;
         }
 
@@ -247,69 +280,66 @@ const Board = props => {
         //is board in flag mode?
         //if it is => flag? set flag to true
         //else return
-        if(flag && affectedRow[colIdx].hidden) //in flag mode
-        {
+        if (flag && affectedRow[colIdx].hidden) {
+            //in flag mode
             affectedRow[colIdx] = {
                 ...affectedRow[colIdx],
                 flag: !affectedRow[colIdx].flag,
-            }
+            };
             newBoard[rowIdx] = affectedRow;
             setBoard(newBoard);
             return;
         }
-        if(affectedRow[colIdx].flag)
-        {
+        if (affectedRow[colIdx].flag) {
             return;
         }
 
-        if(!affectedRow[colIdx].hidden)
-        {
-            return; 
+        if (!affectedRow[colIdx].hidden) {
+            return;
         }
 
         //reveals tiles with values
         affectedRow[colIdx] = {
             ...affectedRow[colIdx],
-            hidden: !affectedRow[colIdx].hidden
+            hidden: !affectedRow[colIdx].hidden,
         };
 
         //mine tiles
-        if(affectedRow[colIdx].hasMine){
+        if (affectedRow[colIdx].hasMine) {
             console.log("mine");
             affectedRow[colIdx] = {
                 // mineRevealed: true,
                 ...affectedRow[colIdx],
-                backgroundColor: 'red',
-                hidden: false
+                backgroundColor: "red",
+                hidden: false,
                 // stop timer, record game history to table
-            }
+            };
             setGameover(true);
+            setstatsTableTime(timer);
+            setOutcome("Loser :(");
             setMessage("Gameover, you lost!");
-        }
-        else //reveals non-mine tiles
-        {
+        } //reveals non-mine tiles
+        else {
             affectedRow[colIdx] = {
                 ...affectedRow[colIdx],
-                backgroundColor: 'white',
+                backgroundColor: "white",
             };
         }
         newBoard[rowIdx] = affectedRow;
         setBoard(newBoard);
-    }    
+    };
 
     const handleChange = (buttonPressed) => {
         //done
-        if(buttonPressed === "flag_button")
-        {
+        if (buttonPressed === "flag_button") {
             setButton(buttonPressed);
             // console.log("flag");
             setFlag(!flag);
             return;
         }
-        
+
         //done
-        if(buttonPressed === "bomb_button")
-        {
+        if (buttonPressed === "bomb_button") {
             setButton(buttonPressed);
             // console.log("bomb/mine");
             revealMines();
@@ -317,16 +347,14 @@ const Board = props => {
         }
 
         //done
-        if(buttonPressed === "reveal_button")
-        {
+        if (buttonPressed === "reveal_button") {
             setButton(buttonPressed);
             // console.log("reveal");
             revealTiles();
             setGameover(true);
         }
 
-        if(buttonPressed === "reset_button")
-        {
+        if (buttonPressed === "reset_button") {
             setButton(buttonPressed);
             // console.log("reset");
             setBoard(initBoard(numMines));
@@ -335,116 +363,197 @@ const Board = props => {
             setMessage("");
             setFlag(false);
             setButton(null);
+            setstatsTableTime(null);
+            setOutcome(null);
         }
-    }
+    };
 
     //helper function to reveal all the mines on the board for bomb button
     const revealMines = () => {
-        const tempBoard = board.map(row =>
-            row.map(cell => {
+        const tempBoard = board.map((row) =>
+            row.map((cell) => {
                 if (cell.hasMine) {
                     return {
                         ...cell,
                         hidden: false, // Set hidden to false to reveal the mine
-                        backgroundColor: 'red',
+                        backgroundColor: "red",
                     };
                 }
                 return cell;
             })
         );
         setBoard(tempBoard);
-    }
+    };
 
     const revealTiles = () => {
-        const tempBoard = board.map(row =>
-            row.map(cell => {
+        const tempBoard = board.map((row) =>
+            row.map((cell) => {
                 if (cell.hasMine) {
                     return {
                         ...cell,
                         hidden: false, // Set hidden to false to reveal the mine
-                        backgroundColor: 'red',
+                        backgroundColor: "red",
                     };
-                    
-                }
-                else{ //anything that is not a mine
+                } else {
+                    //anything that is not a mine
                     return {
                         ...cell,
                         hidden: false, // Set hidden to false to reveal the mine
-                        backgroundColor: 'white',
+                        backgroundColor: "white",
                     };
-                } 
+                }
             })
         );
         setBoard(tempBoard);
+    };
+
+    //stats table
+    //refactored the statsTableTime variable to a useState
+    const size = `${sizes.num_rows} x ${sizes.num_columns}`;
+
+    function createData(size, statsTableTime, outcome) {
+        return { size, statsTableTime, outcome };
     }
+
+    const gameAttributesTable = [createData(size, statsTableTime, outcome)];
 
     return (
         <Fragment>
+            <DifficultyToggle />
 
-            <DifficultyToggle/>
-
-            <Box sx={{display: "flex", alignItems: "center", justifyContent: "center", fontSize: '32px'}}>
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "32px",
+                }}
+            >
                 Timer: {timer} Seconds
             </Box>
 
             <Box
                 margin="auto"
                 sx={{
-                m: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-            }}>
+                    m: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
                 <Stack spacing={2} direction="row">
-                    <Button value={button} variant="outlined" onClick={() => handleChange("flag_button")}>🚩</Button>
-                    <Button value={button} variant="outlined" onClick={() => handleChange("bomb_button")}>💣</Button>
-                    <Button value={button} variant="contained" onClick={() => handleChange("reveal_button")}>Reveal All</Button>
-                    <Button value={button} variant="contained" color="error" onClick={() => handleChange("reset_button")}>Reset Board</Button>
+                    <Button
+                        value={button}
+                        variant="outlined"
+                        onClick={() => handleChange("flag_button")}
+                    >
+                        🚩
+                    </Button>
+                    <Button
+                        value={button}
+                        variant="outlined"
+                        onClick={() => handleChange("bomb_button")}
+                    >
+                        💣
+                    </Button>
+                    <Button
+                        value={button}
+                        variant="contained"
+                        onClick={() => handleChange("reveal_button")}
+                    >
+                        Reveal All
+                    </Button>
+                    <Button
+                        value={button}
+                        variant="contained"
+                        color="error"
+                        onClick={() => handleChange("reset_button")}
+                    >
+                        Reset Board
+                    </Button>
                 </Stack>
             </Box>
 
-            <Box  
+            <Box
                 margin="auto"
                 sx={{
-                width: width(),
-                height: height(),
-                mt: 2,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-            }}>            
-                <Grid container columns={1}
-                      sx={{
+                    width: width(),
+                    height: height(),
+                    mt: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <Grid
+                    container
+                    columns={1}
+                    sx={{
                         width: width(),
-                        height: height()
-                      }}
+                        height: height(),
+                    }}
                 >
-                    {
-                        board.map((row, rowIdx) =>
-                            <Grid item key={rowIdx} xs={1}>
-                                <Row row={row} onClickCallback={(colIdx) => onClickCallback(rowIdx, colIdx)} />
-                            </Grid>
-                        )
-                    }
+                    {board.map((row, rowIdx) => (
+                        <Grid item key={rowIdx} xs={1}>
+                            <Row
+                                row={row}
+                                onClickCallback={(colIdx) =>
+                                    onClickCallback(rowIdx, colIdx)
+                                }
+                            />
+                        </Grid>
+                    ))}
                 </Grid>
             </Box>
+
+            <div style={{ position: "absolute", top: 0, right: 0}}>
+                <TableContainer component={Paper}>
+                    <Table
+                        sx={{ width: 400 }}
+                        aria-label="game attributes table"
+                    >
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center">Size</TableCell>
+                                <TableCell align="center">Time (Seconds)</TableCell>
+                                <TableCell align="center">Outcome</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {gameAttributesTable.map((row) => (
+                                <TableRow key={row.size}>
+                                    <TableCell align="center" component="th" scope="row">
+                                        {row.size}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {row.statsTableTime}
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        {row.outcome}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </div>
             <Box
-             sx={{
-                width: "100%",
-                height: "100%",
-                mt: 2,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "orange",
-                fontSize: "24px",
-            }}>
+                sx={{
+                    width: "100%",
+                    height: "100%",
+                    mt: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "orange",
+                    fontSize: "24px",
+                }}
+            >
                 {message}
             </Box>
         </Fragment>
     );
-
 };
 
 export default Board;

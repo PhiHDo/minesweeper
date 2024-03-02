@@ -1,9 +1,9 @@
 const sizes = {
     
-    num_rows: 8, //12 for hard
-    num_columns: 8, //12 for hard
-    cell_width: 60, // 45 for hard
-    cell_height: 60, //45 for hard
+    num_rows: 8, //16 for hard
+    num_columns: 8, //16 for hard
+    cell_width: 60, // 30 for hard
+    cell_height: 60, //30 for hard
     h_gap: 0.1,
     v_gap: 0.1,
 

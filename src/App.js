@@ -14,25 +14,13 @@ function App() {
     const [updateCellWidth, setUpdateCellWidth] = useState(sizes.cell_width);
     const [updateCellHeight, setUpdateCellHeight] = useState(sizes.cell_height);
 
-
-
-    const [gameStats, setGameStats] = useState({
-        size: "small",
-        timeSeconds: 0,
-        outcome: null,
-    });
-
-
-
     return (
         <Fragment>
             <Box>
                 <TopBanner
                     title="Minesweeper"
                 />
-                
                 <Board/>
-                <StatsTable/>
             </Box>
         </Fragment>
     );

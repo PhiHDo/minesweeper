@@ -7,11 +7,16 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import Board from './Board';
+import sizes from '../utils/sizes';
+
+const sizeString = `${sizes.num_rows} x ${Board.num_columns}`;
+
 function createData(size, timeSeconds, outcome) {
   return { size, timeSeconds, outcome };
 }
 
-let size = "Small";
+let size = sizeString;
 let timeSeconds = "0";
 let outcome = "Null";
 
