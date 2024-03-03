@@ -16,7 +16,9 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-//code given by Dr. Kooshesh to render board, I tweaked it a bit to get a grid from connect 4
+//code a was formatted using the VSCode extension, Prettier
+
+//code given by Dr. Kooshesh to render board, I tweaked it a bit to get a grid from connect 4 v1
 const initBoard = (numMines) => {
     // returns the internal representation of the board.
     const board = new Array(sizes.num_rows).fill(null).map(() =>
@@ -126,7 +128,6 @@ const Cell = (props) => {
                 fontFamily: "Courier New, monospace",
             }}
         >
-            {/* {cellContent.hidden ? null : cellContent.value} */}
             {displayValue()}
         </Box>
     );
@@ -154,13 +155,12 @@ const Row = (props) => {
 };
 
 const DifficultyToggle = (props) => {
-    // const {difficulty, setDifficulty} = props;
     const [difficulty, setDifficulty] = useState("Standard");
 
     const handleChange = (event, newDifficulty) => {
         if (newDifficulty === "Standard") {
             setDifficulty(newDifficulty);
-            //in hindsight I am not sure why I did not initially utilize useState here...
+            //in hindsight I am not sure why I did not initially utilize useState/usereducer here...
             sizes.num_rows = 8;
             sizes.num_columns = 8;
             sizes.mines = 10;
@@ -230,6 +230,14 @@ const Board = (props) => {
     const [statsTableTime, setstatsTableTime] = useState(null);
     const [outcome, setOutcome] = useState(null);
 
+    //for stats table
+    const size = `${sizes.num_rows} x ${sizes.num_columns}`;
+    function createData(size, statsTableTime, outcome) {
+        return { size, statsTableTime, outcome };
+    }
+
+    const gameAttributesTable = [createData(size, statsTableTime, outcome)];
+
     //added this
     useEffect(() => {
         setBoard(initBoard(numMines));
@@ -261,9 +269,9 @@ const Board = (props) => {
             setGameover(true);
             setstatsTableTime(timer);
             setOutcome("Winner :)");
-            setMessage("You win!");
+            setMessage("You win! \n Select 'Reset Board' to play again.");
         }
-    }, [board, numMines]);
+    }, [board, numMines, timer]);
 
     const onClickCallback = (rowIdx, colIdx) => {
         // console.log(`rowIdx = ${rowIdx}, colIdx = ${colIdx}`);
@@ -306,13 +314,12 @@ const Board = (props) => {
 
         //mine tiles
         if (affectedRow[colIdx].hasMine) {
-            console.log("mine");
+            // console.log("mine");
             affectedRow[colIdx] = {
                 // mineRevealed: true,
                 ...affectedRow[colIdx],
                 backgroundColor: "red",
                 hidden: false,
-                // stop timer, record game history to table
             };
             setGameover(true);
             setstatsTableTime(timer);
@@ -407,16 +414,6 @@ const Board = (props) => {
         setBoard(tempBoard);
     };
 
-    //stats table
-    //refactored the statsTableTime variable to a useState
-    const size = `${sizes.num_rows} x ${sizes.num_columns}`;
-
-    function createData(size, statsTableTime, outcome) {
-        return { size, statsTableTime, outcome };
-    }
-
-    const gameAttributesTable = [createData(size, statsTableTime, outcome)];
-
     return (
         <Fragment>
             <DifficultyToggle />
@@ -506,7 +503,7 @@ const Board = (props) => {
                 </Grid>
             </Box>
 
-            <div style={{ position: "absolute", top: 0, right: 0}}>
+            <div style={{ position: "absolute", top: 0, right: 0 }}>
                 <TableContainer component={Paper}>
                     <Table
                         sx={{ width: 400 }}
@@ -515,14 +512,20 @@ const Board = (props) => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">Size</TableCell>
-                                <TableCell align="center">Time (Seconds)</TableCell>
+                                <TableCell align="center">
+                                    Time (Seconds)
+                                </TableCell>
                                 <TableCell align="center">Outcome</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {gameAttributesTable.map((row) => (
                                 <TableRow key={row.size}>
-                                    <TableCell align="center" component="th" scope="row">
+                                    <TableCell
+                                        align="center"
+                                        component="th"
+                                        scope="row"
+                                    >
                                         {row.size}
                                     </TableCell>
                                     <TableCell align="center">
